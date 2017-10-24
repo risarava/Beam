@@ -1,0 +1,5 @@
+<resources>
+    <string name="app_name">AddrealmSudent</string>
+
+    <string name="ppm">PPM : %d</string>
+</resources>
