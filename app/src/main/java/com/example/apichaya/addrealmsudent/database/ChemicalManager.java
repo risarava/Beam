@@ -101,6 +101,14 @@ public class ChemicalManager {
         return result.get(0);
     }
 
+    public String getChemicalName(int chemicalId) {
+        RealmQuery<ChemicalObject> query = realm.where(ChemicalObject.class);
+        RealmResults<ChemicalObject> result = query
+                .equalTo("id", chemicalId)
+                .findAll();
+        return result.get(0).getName();
+    }
+
     public int getSize() {
         RealmQuery<ChemicalObject> query = realm.where(ChemicalObject.class);
         RealmResults<ChemicalObject> result = query

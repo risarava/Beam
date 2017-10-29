@@ -1,5 +1,9 @@
 <resources>
-    <string name="app_name">AddrealmSudent</string>
+    <string name="app_name">Chemistry</string>
 
     <string name="ppm">PPM : %d</string>
+    <string name="red_value">Red : %d</string>
+    <string name="green_value">Green : %d</string>
+    <string name="blue_value">Blue : %d</string>
+
 </resources>

@@ -16,7 +16,8 @@
             android:gravity="center"
             android:padding="@dimen/padding_mini"
             android:text="AVE"
-            android:textSize="@dimen/text_mini" />
+            android:textSize="@dimen/text_mini"
+            android:textStyle="bold" />
 
         <View
             android:layout_width="1dp"
@@ -63,4 +64,9 @@
             android:text="Blue"
             android:textSize="@dimen/text_mini" />
     </LinearLayout>
+
+    <View
+        android:layout_width="match_parent"
+        android:layout_height="1dp"
+        android:background="@color/color_gray_light" />
 </LinearLayout>

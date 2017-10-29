@@ -32,6 +32,7 @@ public class MainActivity extends AbstractToolbarActivity implements View.OnClic
     private RecyclerView recyclerView;
     private TextView txtAddChemical;
     private TextView txtViewGraph;
+    private TextView txtNotFound;
 
     private ChemicalManager chemicalManager;
     private TestManager testManager;
@@ -45,7 +46,7 @@ public class MainActivity extends AbstractToolbarActivity implements View.OnClic
 
     @Override
     protected void bindActionbar(ImageView imgIcon, ImageView menuLeft, LinearLayout toolbar, TextView txtTitleToolbar) {
-        setTitle("รายการ");
+        setTitle("Substance List");
     }
 
     @Override
@@ -53,6 +54,7 @@ public class MainActivity extends AbstractToolbarActivity implements View.OnClic
         recyclerView = (RecyclerView) findViewById(R.id.recycleView);
         txtAddChemical = (TextView) findViewById(R.id.textviewAddChemical);
         txtViewGraph = (TextView) findViewById(R.id.textviewViewGraph);
+        txtNotFound = (TextView) findViewById(R.id.textviewNotFound);
 
         txtAddChemical.setOnClickListener(this);
         txtViewGraph.setOnClickListener(this);
@@ -82,8 +84,14 @@ public class MainActivity extends AbstractToolbarActivity implements View.OnClic
             }
 
             @Override
-            public void onItemRemove(View view, int itemId, int position) {
-
+            public void onItemRemove(View view, final int itemId, final int position) {
+                MyAlertDialog.dialogAlert(activity, new MyAlertDialog.OnClickPositiveListener() {
+                    @Override
+                    public void onClicked() {
+                        chemicalManager.delete(itemId);
+                        setChemicalData();
+                    }
+                });
             }
 
             @Override
@@ -99,7 +107,7 @@ public class MainActivity extends AbstractToolbarActivity implements View.OnClic
                 MyAlertDialog.dialogEditChemical(activity,
                         chemicalObject.getName(),
                         chemicalObject.getPpm(),
-                        new MyAlertDialog.OnClickPositiveListener() {
+                        new MyAlertDialog.OnClickPositiveAddSubstanceListener() {
                             @Override
                             public void onClicked(String name, String ppm) {
                                 chemicalManager.update(new ChemicalObject(
@@ -118,6 +126,7 @@ public class MainActivity extends AbstractToolbarActivity implements View.OnClic
         ArrayList<ChemicalObjectBase> objectBaseArrayList = new ArrayList<>();
         for (ChemicalObject object : chemicalArrayList) {
             ChemicalObjectBase base = new ChemicalObjectBase();
+            base.setId(object.getId());
             base.setName(object.getName());
             base.setPpm(object.getPpm());
             base.setId(object.getId());
@@ -140,24 +149,37 @@ public class MainActivity extends AbstractToolbarActivity implements View.OnClic
 
             //calculation
             ArrayList<RgbColorObject> arrayList = testManager.query(object.getId());
-            ChemicalObjectBase chemicalAVE = new ChemicalObjectBase(
-                    "AVE",
-                    Functions.getAVE(arrayList, Functions.COLOR_RED),
-                    Functions.getAVE(arrayList, Functions.COLOR_GREEN),
-                    Functions.getAVE(arrayList, Functions.COLOR_BLUE),
-                    ChemicalObjectBase.TYPE_FOOTER);
-            objectBaseArrayList.add(chemicalAVE);
+            if (arrayList.size() > 0) {
+                ChemicalObjectBase chemicalAVE = new ChemicalObjectBase(
+                        "AVE",
+                        Functions.getAVE(arrayList, Functions.COLOR_RED),
+                        Functions.getAVE(arrayList, Functions.COLOR_GREEN),
+                        Functions.getAVE(arrayList, Functions.COLOR_BLUE),
+                        ChemicalObjectBase.TYPE_FOOTER);
+                objectBaseArrayList.add(chemicalAVE);
 
-            ChemicalObjectBase chemicalSD = new ChemicalObjectBase(
-                    "SD",
-                    Functions.getSD(arrayList, chemicalAVE.getAveRed(), Functions.COLOR_RED),
-                    Functions.getSD(arrayList, chemicalAVE.getAveGreen(), Functions.COLOR_GREEN),
-                    Functions.getSD(arrayList, chemicalAVE.getAveBlue(), Functions.COLOR_BLUE),
-                    ChemicalObjectBase.TYPE_FOOTER);
-            objectBaseArrayList.add(chemicalSD);
+                ChemicalObjectBase chemicalSD = new ChemicalObjectBase(
+                        "SD",
+                        Functions.getSD(arrayList, chemicalAVE.getAveRed(), Functions.COLOR_RED),
+                        Functions.getSD(arrayList, chemicalAVE.getAveGreen(), Functions.COLOR_GREEN),
+                        Functions.getSD(arrayList, chemicalAVE.getAveBlue(), Functions.COLOR_BLUE),
+                        ChemicalObjectBase.TYPE_FOOTER);
+                objectBaseArrayList.add(chemicalSD);
 
+
+                ChemicalObjectBase chemicalPercentRSD = new ChemicalObjectBase(
+                        "% RSD",
+                        ((chemicalSD.getAveRed() / chemicalAVE.getAveRed()) * 100),
+                        ((chemicalSD.getAveGreen() / chemicalAVE.getAveGreen()) * 100),
+                        ((chemicalSD.getAveBlue() / chemicalAVE.getAveBlue()) * 100),
+                        ChemicalObjectBase.TYPE_FOOTER);
+                objectBaseArrayList.add(chemicalPercentRSD);
+
+
+            }
 
         }
+        txtNotFound.setVisibility((objectBaseArrayList.size() == 0) ? View.VISIBLE : View.GONE);
         chemicalAdapter.setData(objectBaseArrayList);
     }
 
@@ -171,7 +193,7 @@ public class MainActivity extends AbstractToolbarActivity implements View.OnClic
     public void onClick(View view) {
         switch (view.getId()) {
             case R.id.textviewAddChemical:
-                MyAlertDialog.dialogAddChemical(activity, new MyAlertDialog.OnClickPositiveListener() {
+                MyAlertDialog.dialogAddChemical(activity, new MyAlertDialog.OnClickPositiveAddSubstanceListener() {
                     @Override
                     public void onClicked(String name, String ppm) {
                         chemicalManager.addChemical(new ChemicalObject(
@@ -181,8 +203,7 @@ public class MainActivity extends AbstractToolbarActivity implements View.OnClic
                 });
                 break;
             case R.id.textviewViewGraph:
-                chemicalManager.deleteAll();
-                setChemicalData();
+
                 break;
 
             default:

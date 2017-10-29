@@ -24,9 +24,10 @@
 
         <TextView
             android:id="@+id/textviewPPM"
-            android:text="ppm : "
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
+            android:padding="@dimen/padding_tiny"
+            android:text="ppm : "
             android:textColor="@color/color_white"
             android:textSize="@dimen/text_mini" />
 
@@ -34,17 +35,22 @@
             android:id="@+id/imageviewEdit"
             android:layout_width="wrap_content"
             android:layout_height="match_parent"
-            android:layout_marginRight="@dimen/padding_small"
-            android:padding="@dimen/padding_mini"
+            android:padding="@dimen/padding_tiny"
             android:src="@android:drawable/ic_menu_edit" />
 
         <ImageView
             android:id="@+id/imageviewAdd"
             android:layout_width="wrap_content"
             android:layout_height="match_parent"
-            android:layout_marginRight="@dimen/padding_small"
-            android:padding="@dimen/padding_mini"
+            android:padding="@dimen/padding_tiny"
             android:src="@android:drawable/ic_menu_add" />
+
+        <ImageView
+            android:id="@+id/imageviewDelete"
+            android:layout_width="wrap_content"
+            android:layout_height="match_parent"
+            android:padding="@dimen/padding_tiny"
+            android:src="@android:drawable/ic_menu_delete" />
 
     </LinearLayout>
 
@@ -58,8 +64,14 @@
             android:layout_weight="1"
             android:gravity="center"
             android:padding="@dimen/padding_mini"
-            android:text="ครั้งที่"
-            android:textSize="@dimen/text_mini" />
+            android:text="Number"
+            android:textSize="@dimen/text_mini"
+            android:textStyle="bold" />
+
+        <View
+            android:layout_width="1dp"
+            android:layout_height="match_parent"
+            android:background="@color/color_gray_light" />
 
         <TextView
             android:layout_width="0dp"
@@ -70,7 +82,13 @@
             android:padding="@dimen/padding_mini"
             android:text="Red"
             android:textColor="@color/color_white"
-            android:textSize="@dimen/text_mini" />
+            android:textSize="@dimen/text_mini"
+            android:textStyle="bold" />
+
+        <View
+            android:layout_width="1dp"
+            android:layout_height="match_parent"
+            android:background="@color/color_gray_light" />
 
         <TextView
             android:layout_width="0dp"
@@ -81,7 +99,13 @@
             android:padding="@dimen/padding_mini"
             android:text="Green"
             android:textColor="@color/color_white"
-            android:textSize="@dimen/text_mini" />
+            android:textSize="@dimen/text_mini"
+            android:textStyle="bold" />
+
+        <View
+            android:layout_width="1dp"
+            android:layout_height="match_parent"
+            android:background="@color/color_gray_light" />
 
         <TextView
             android:layout_width="0dp"
@@ -92,6 +116,12 @@
             android:padding="@dimen/padding_mini"
             android:text="Red"
             android:textColor="@color/color_white"
-            android:textSize="@dimen/text_mini" />
+            android:textSize="@dimen/text_mini"
+            android:textStyle="bold" />
     </LinearLayout>
+
+    <View
+        android:layout_width="match_parent"
+        android:layout_height="1dp"
+        android:background="@color/color_gray_light" />
 </LinearLayout>

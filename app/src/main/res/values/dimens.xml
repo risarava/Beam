@@ -7,6 +7,9 @@
     <dimen name="corner_normal">10dp</dimen>
     <dimen name="corner_large">15dp</dimen>
 
+    <dimen name="min_height_title_dialog">100dp</dimen>
+
+    <dimen name="padding_tiny">3dp</dimen>
     <dimen name="padding_mini">5dp</dimen>
     <dimen name="padding_small">10dp</dimen>
     <dimen name="padding_normal">15dp</dimen>

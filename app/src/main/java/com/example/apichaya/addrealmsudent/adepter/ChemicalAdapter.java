@@ -79,6 +79,16 @@ public class ChemicalAdapter extends RecyclerView.Adapter<RecyclerView.ViewHolde
                         onItemClickListener.editItemClick(view, chemicalObjectBase.getId(), position);
                     }
                 });
+
+                viewHolder.imgDelete.setOnClickListener(new View.OnClickListener() {
+                    @Override
+                    public void onClick(View view) {
+                        if (onItemClickListener == null) {
+                            return;
+                        }
+                        onItemClickListener.onItemRemove(view, chemicalObjectBase.getId(), position);
+                    }
+                });
                 break;
             case ChemicalObjectBase.TYPE_BODY:
                 final ListChildViewHolder childViewHolder = (ListChildViewHolder) holder;
@@ -125,6 +135,7 @@ public class ChemicalAdapter extends RecyclerView.Adapter<RecyclerView.ViewHolde
         private TextView txtPPM;
         private ImageView imgAdd;
         private ImageView imgEdit;
+        private ImageView imgDelete;
 
         public ListHeaderViewHolder(View itemView) {
             super(itemView);
@@ -132,6 +143,7 @@ public class ChemicalAdapter extends RecyclerView.Adapter<RecyclerView.ViewHolde
             txtPPM = (TextView) itemView.findViewById(R.id.textviewPPM);
             imgAdd = (ImageView) itemView.findViewById(R.id.imageviewAdd);
             imgEdit = (ImageView) itemView.findViewById(R.id.imageviewEdit);
+            imgDelete =(ImageView) itemView.findViewById(R.id.imageviewDelete);
         }
     }
 
@@ -162,9 +174,10 @@ public class ChemicalAdapter extends RecyclerView.Adapter<RecyclerView.ViewHolde
     }
 
     public void removeAtPosition(int position) {
-        this.data.remove(position);
-        notifyItemRemoved(position);
-        notifyDataSetChanged();
+        if (position < this.data.size()) {
+            this.data.remove(position);
+            notifyItemRemoved(position);
+        }
     }
 
     public interface OnItemClickListener {

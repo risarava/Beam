@@ -9,7 +9,6 @@ import android.support.v7.widget.LinearLayoutManager;
 import android.support.v7.widget.RecyclerView;
 import android.util.Log;
 import android.view.View;
-import android.widget.Button;
 import android.widget.ImageView;
 import android.widget.LinearLayout;
 import android.widget.TextView;
@@ -19,7 +18,9 @@ import com.example.apichaya.addrealmsudent.Model.RgbColorObject;
 import com.example.apichaya.addrealmsudent.R;
 import com.example.apichaya.addrealmsudent.adepter.MyAdapter;
 import com.example.apichaya.addrealmsudent.customs.AbstractToolbarActivity;
+import com.example.apichaya.addrealmsudent.database.ChemicalManager;
 import com.example.apichaya.addrealmsudent.database.TestManager;
+import com.example.apichaya.addrealmsudent.dialog.MyAlertDialog;
 import com.theartofdev.edmodo.cropper.CropImage;
 import com.theartofdev.edmodo.cropper.CropImageView;
 
@@ -29,29 +30,30 @@ import java.util.ArrayList;
 public class AddActivity extends AbstractToolbarActivity implements View.OnClickListener {
 
     private int chemicalId = 0;
+    private int redValue = 0;
+    private int greenValue = 0;
+    private int blueValue = 0;
+    private Bitmap bitmap;
 
-    Button btnAssay;
-    Button btnSendData;
-    TextView btn2;
-    Button btnAssayPercent;
-    Bitmap bitmap;
-    ImageView imageview;
-    TextView tvRedvalue;
-    TextView tvGreenvalue;
-    TextView tvBluevalue;
-
+    //    TextView btn2;
+    private TextView txtName;
+    private TextView txtRed;
+    private TextView txtGreen;
+    private TextView txtBlue;
+    private TextView txtAdd;
+    private TextView txtRedPercent;
+    private TextView txtGreenPercent;
+    private TextView txtBluePercent;
+    private ImageView imageview;
     private RecyclerView mRecyclerView;
+
     private MyAdapter mAdapter;
     private RecyclerView.LayoutManager mLayoutManager;
-    private Button btnAdd;
-    private Button btnDelete;
-    private TextView tv1;
-    private TextView tv2;
-    private TextView tv3;
-    TextView total;
+
     int sum = 0;
     ArrayList<RgbColorObject> rgbColorObjectArrayList = new ArrayList<>();
     private TestManager testManager;
+    private ChemicalManager chemicalManager;
 
     @Override
     protected int setContentView() {
@@ -60,58 +62,38 @@ public class AddActivity extends AbstractToolbarActivity implements View.OnClick
 
     @Override
     protected void bindActionbar(ImageView imgIcon, ImageView menuLeft, LinearLayout toolbar, TextView txtTitleToolbar) {
-        setTitle("เพิ่ม");
+        setTitle("Add experiment");
     }
 
     @Override
     protected void bindUI(Bundle savedInstanceState) {
-        btn2 = (TextView) findViewById(R.id.textviewCalculate);
-        btnAssay = (Button) findViewById(R.id.btnAssay);
-        btnAssayPercent = (Button) findViewById(R.id.btnAssayPerCent);
+//        btn2 = (TextView) findViewById(R.id.textviewCalculate);
+        txtName = (TextView) findViewById(R.id.textviewName);
+        txtAdd = (TextView) findViewById(R.id.textviewAdd);
+        txtRedPercent = (TextView) findViewById(R.id.textviewRedPercent);
+        txtGreenPercent = (TextView) findViewById(R.id.textviewGreenPercent);
+        txtBluePercent = (TextView) findViewById(R.id.textviewBluePercent);
+        txtRed = (TextView) findViewById(R.id.textviewRed);
+        txtGreen = (TextView) findViewById(R.id.textviewGreen);
+        txtBlue = (TextView) findViewById(R.id.textviewBlue);
         imageview = (ImageView) findViewById(R.id.quick_start_cropped_image);
-        btnSendData = (Button) findViewById(R.id.sentDataButton);
-        btnAdd = (Button) findViewById(R.id.addButton);
-        btnDelete = (Button) findViewById(R.id.delButton);
         mRecyclerView = (RecyclerView) findViewById(R.id.recycleView);
-        tv1 = (TextView) findViewById(R.id.tv1);
-        tv2 = (TextView) findViewById(R.id.tv2);
-        tv3 = (TextView) findViewById(R.id.tv3);
-        tvRedvalue = (TextView) findViewById(R.id.tvRedvalue);
-        tvGreenvalue = (TextView) findViewById(R.id.tvGreenvalue);
-        tvBluevalue = (TextView) findViewById(R.id.tvBluevalue);
 
-        btn2.setOnClickListener(this);
-        btnAdd.setOnClickListener(this);
-        btnDelete.setOnClickListener(this);
-
-        initInstance();
+//        btn2.setOnClickListener(this);
+        txtAdd.setOnClickListener(this);
 
         chemicalId = getIntent().getIntExtra(MainActivity.EXTRA_CHEMICAL_ID, 0);
         testManager = new TestManager();
+        chemicalManager = new ChemicalManager();
         onBackPressedButtonLeft();
 
     }
 
     @Override
     protected void setupUI() {
+        txtName.setText(chemicalManager.getChemicalName(chemicalId));
         initRecycleView();
         showData();
-    }
-
-    private void initInstance() {
-
-        btnAssay.setOnClickListener(new View.OnClickListener() {
-            @Override
-            public void onClick(View view) {
-                getAverageColorRGB(bitmap);
-            }
-        });
-        btnAssayPercent.setOnClickListener(new View.OnClickListener() {
-            @Override
-            public void onClick(View view) {
-                getAverageColorRGBpercent(bitmap);
-            }
-        });
     }
 
     private void initRecycleView() {
@@ -120,6 +102,19 @@ public class AddActivity extends AbstractToolbarActivity implements View.OnClick
 
         mAdapter = new MyAdapter(getApplicationContext(), rgbColorObjectArrayList);
         mRecyclerView.setAdapter(mAdapter);
+
+        mAdapter.setOnItemDelete(new MyAdapter.OnItemDelete() {
+            @Override
+            public void onClicked(final int position, final int id) {
+                MyAlertDialog.dialogAlert(activity, new MyAlertDialog.OnClickPositiveListener() {
+                    @Override
+                    public void onClicked() {
+                        testManager.delete(id);
+                        mAdapter.removePosition(position);
+                    }
+                });
+            }
+        });
     }
 
     private void deleteData() {
@@ -160,7 +155,12 @@ public class AddActivity extends AbstractToolbarActivity implements View.OnClick
                     e.printStackTrace();
                 }
                 imageview.setImageBitmap(bitmap);
-//                imageview.setImageURI(result.getUri());
+                getAverageColorRGB(bitmap);
+                getAverageColorRGBpercent(bitmap);
+
+                txtAdd.setAlpha(1f);
+                txtAdd.setEnabled(true);
+
                 Toast.makeText(this, "Cropping successful, Sample: " + result.getSampleSize(), Toast.LENGTH_LONG).show();
             } else if (resultCode == CropImage.CROP_IMAGE_ACTIVITY_RESULT_ERROR_CODE) {
                 Toast.makeText(this, "Cropping failed: " + result.getError(), Toast.LENGTH_LONG).show();
@@ -191,9 +191,13 @@ public class AddActivity extends AbstractToolbarActivity implements View.OnClick
         g /= size;
         b /= size;
 
-        tv1.setText(String.valueOf(r));
-        tv2.setText(String.valueOf(g));
-        tv3.setText(String.valueOf(b));
+        redValue = r;
+        greenValue = g;
+        blueValue = b;
+
+        txtRed.setText(getString(R.string.red_value, redValue));
+        txtGreen.setText(getString(R.string.green_value, greenValue));
+        txtBlue.setText(getString(R.string.blue_value, blueValue));
         Log.e("Color red = ", String.valueOf(r));
         Log.e("Color G = ", String.valueOf(g));
         Log.e("Color B = ", String.valueOf(b));
@@ -231,9 +235,9 @@ public class AddActivity extends AbstractToolbarActivity implements View.OnClick
         Double percentGreen = (g * 100) / total;
         Double percentBlue = (b * 100) / total;
 
-        tv1.setText(String.format("Red: %.2f ", percentRed) + " %");
-        tv2.setText(String.format("Green: %.2f ", percentGreen) + " %");
-        tv3.setText(String.format("Blue: %.2f ", percentBlue) + " %");
+        txtRedPercent.setText(String.format("%.2f ", percentRed) + " %");
+        txtGreenPercent.setText(String.format("%.2f ", percentGreen) + " %");
+        txtBluePercent.setText(String.format("Blu%.2f ", percentBlue) + " %");
 
         Log.e("Color red = ", String.valueOf(r));
         Log.e("Color G = ", String.valueOf(g));
@@ -248,32 +252,47 @@ public class AddActivity extends AbstractToolbarActivity implements View.OnClick
     @Override
     public void onClick(View view) {
         switch (view.getId()) {
-            case R.id.textviewCalculate:
-                Intent intent = new Intent(AddActivity.this, CalculateActivity.class);
-                startActivity(intent);
-                break;
-            case R.id.addButton:
-                if (tv1.length() == 0 && tv2.length() == 0 && tv3.length() == 0) {
+//            case R.id.textviewCalculate:
+//                Intent intent = new Intent(AddActivity.this, CalculateActivity.class);
+//                startActivity(intent);
+//                break;
+            case R.id.textviewAdd:
+                if (redValue == 0 && greenValue == 0 && blueValue == 0) {
                     return;
                 }
                 mAdapter.addRgbColor(new RgbColorObject(
-                        Integer.parseInt(tv1.getText().toString().trim()),
-                        Integer.parseInt(tv2.getText().toString().trim()),
-                        Integer.parseInt(tv3.getText().toString().trim())));
+                        redValue,
+                        greenValue,
+                        blueValue));
                 try {
                     writeToDB(testManager.getSize() + 1, chemicalId,
-                            Integer.parseInt(tv1.getText().toString().trim()),
-                            Integer.parseInt(tv2.getText().toString().trim()),
-                            Integer.parseInt(tv3.getText().toString().trim()));
+                            redValue,
+                            greenValue,
+                            blueValue);
                 } catch (Exception e) {
                     Toast.makeText(AddActivity.this, "Input Data!", Toast.LENGTH_SHORT).show();
                 }
+                imageview.setImageResource(R.drawable.add_image_icon);
+                //Clear value
+                redValue = 0;
+                greenValue = 0;
+                blueValue = 0;
+
+                txtRed.setText(getString(R.string.red_value, redValue));
+                txtGreen.setText(getString(R.string.green_value, greenValue));
+                txtBlue.setText(getString(R.string.blue_value, blueValue));
+
+                txtRedPercent.setText("0 %");
+                txtGreenPercent.setText("0 %");
+                txtBluePercent.setText("0 %");
+                txtAdd.setAlpha(0.5f);
+                txtAdd.setEnabled(false);
                 break;
 
-            case R.id.delButton:
-                deleteData();
-                showData();
-                break;
+//            case R.id.delButton:
+//                deleteData();
+//                showData();
+//                break;
 
             default:
                 break;

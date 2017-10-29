@@ -15,7 +15,7 @@
             android:layout_weight="1"
             android:gravity="center"
             android:padding="@dimen/padding_mini"
-            android:text="ครั้งที่"
+            android:text="Number"
             android:textSize="@dimen/text_mini" />
 
         <View
@@ -63,4 +63,9 @@
             android:text="Blue"
             android:textSize="@dimen/text_mini" />
     </LinearLayout>
+
+    <View
+        android:layout_width="match_parent"
+        android:layout_height="1dp"
+        android:background="@color/color_gray_light" />
 </LinearLayout>
