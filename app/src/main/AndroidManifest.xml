@@ -30,6 +30,9 @@
         <activity
             android:name=".activity.AddActivity"
             android:screenOrientation="portrait" />
+        <activity
+            android:name=".activity.ViewGraphActivity"
+            android:screenOrientation="portrait" />
 
     </application>
 

@@ -1,8 +1,6 @@
 package com.example.apichaya.addrealmsudent.Model;
 
-import io.realm.Realm;
 import io.realm.RealmObject;
-import io.realm.annotations.Index;
 import io.realm.annotations.Required;
 
 public class Student extends RealmObject {

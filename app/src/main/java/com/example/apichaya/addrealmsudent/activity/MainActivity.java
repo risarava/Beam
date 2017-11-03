@@ -203,7 +203,8 @@ public class MainActivity extends AbstractToolbarActivity implements View.OnClic
                 });
                 break;
             case R.id.textviewViewGraph:
-
+                Intent intent = new Intent(activity, ViewGraphActivity.class);
+                startActivity(intent);
                 break;
 
             default:
