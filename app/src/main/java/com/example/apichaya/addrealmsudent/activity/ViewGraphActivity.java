@@ -88,7 +88,6 @@ public class ViewGraphActivity extends AbstractToolbarActivity {
                 xAxisTitle.add(String.valueOf(object.getPpm()));
             }
         }
-
         setChart(graphRedArrayList, graphGreenArrayList, graphBlueArrayList);
     }
 
@@ -113,7 +112,7 @@ public class ViewGraphActivity extends AbstractToolbarActivity {
         leftAxis.setAxisMinValue(0f);
         leftAxis.setTextSize(12f);
 
-        XAxis xAxis = chart.getXAxis();
+        final XAxis xAxis = chart.getXAxis();
         xAxis.setPosition(XAxis.XAxisPosition.BOTTOM);
         xAxis.setDrawGridLines(false);
         xAxis.setDrawAxisLine(true);
@@ -127,7 +126,17 @@ public class ViewGraphActivity extends AbstractToolbarActivity {
 
             @Override
             public String getFormattedValue(float value, AxisBase axis) {
-                return xAxisTitle.get((int) value);
+                if (xAxisTitle.size() > 1) {
+                    return xAxisTitle.get((int) value);
+                } else if (xAxisTitle.size() == 1) {
+                    if (value < 0 | value >= xAxisTitle.size()) {
+                        return "";
+                    } else {
+                        return xAxisTitle.get(0);
+                    }
+                } else {
+                    return "0";
+                }
             }
 
             @Override
@@ -138,18 +147,25 @@ public class ViewGraphActivity extends AbstractToolbarActivity {
 
         //set data to graph
         List<ILineDataSet> dataSets = new ArrayList<>();
-        dataSets.add(getLineDataSet(graphRedArrayList));
-        dataSets.add(getLineDataSet(graphGreenArrayList));
-        dataSets.add(getLineDataSet(graphBlueArrayList));
+        if (graphRedArrayList.size() > 0) {
+            dataSets.add(getLineDataSet(graphRedArrayList));
+        }
+        if (graphGreenArrayList.size() > 0) {
+            dataSets.add(getLineDataSet(graphGreenArrayList));
+        }
+        if (graphBlueArrayList.size() > 0) {
+            dataSets.add(getLineDataSet(graphBlueArrayList));
+        }
+        if (dataSets.size() > 0) {
+            LineData lineData = new LineData(dataSets);
 
-        LineData lineData = new LineData(dataSets);
+            CombinedData data = new CombinedData();
+            data.setData(lineData);
 
-        CombinedData data = new CombinedData();
-        data.setData(lineData);
-
-        chart.setData(data);
-        chart.notifyDataSetChanged();
-        chart.invalidate();
+            chart.setData(data);
+            chart.notifyDataSetChanged();
+            chart.invalidate();
+        }
     }
 
     private LineDataSet getLineDataSet(ArrayList<GraphObject> objectArrayList) {
@@ -170,7 +186,7 @@ public class ViewGraphActivity extends AbstractToolbarActivity {
         set.setValueTextSize(8);
         set.setDrawValues(true);
         set.setAxisDependency(YAxis.AxisDependency.LEFT);
-
         return set;
+
     }
 }
