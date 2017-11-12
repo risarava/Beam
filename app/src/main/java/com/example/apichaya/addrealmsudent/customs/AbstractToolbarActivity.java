@@ -24,7 +24,7 @@ public abstract class AbstractToolbarActivity extends Activity {
 
     protected abstract int setContentView();
 
-    protected abstract void bindActionbar(ImageView imgIcon, ImageView menuLeft, LinearLayout toolbar, TextView txtTitleToolbar);
+    protected abstract void bindActionbar(ImageView imgIcon, ImageView menuLeft, ImageView imgIconRight, TextView txtTitleToolbar);
 
     protected abstract void bindUI(Bundle savedInstanceState);
 
@@ -53,7 +53,8 @@ public abstract class AbstractToolbarActivity extends Activity {
         txtTitleToolbar = (TextView) findViewById(R.id.textviewTitleToolbar);
         imgIconLeft = (ImageView) findViewById(R.id.imageviewIconLeft);
         imgIcon = (ImageView) findViewById(R.id.imageviewIconToolbar);
-        bindActionbar(imgIcon, imgIconLeft, mToolbar, txtTitleToolbar);
+        ImageView imgIconRight = (ImageView)  findViewById(R.id.imageviewIconRight);
+        bindActionbar(imgIcon, imgIconLeft, imgIconRight, txtTitleToolbar);
     }
 
     private View.OnClickListener onMenuClicked = new View.OnClickListener() {

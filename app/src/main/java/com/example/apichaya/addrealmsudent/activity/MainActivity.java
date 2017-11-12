@@ -45,7 +45,7 @@ public class MainActivity extends AbstractToolbarActivity implements View.OnClic
     }
 
     @Override
-    protected void bindActionbar(ImageView imgIcon, ImageView menuLeft, LinearLayout toolbar, TextView txtTitleToolbar) {
+    protected void bindActionbar(ImageView imgIcon, ImageView menuLeft, ImageView imgIconRight, TextView txtTitleToolbar) {
         setTitle("Substance List");
     }
 

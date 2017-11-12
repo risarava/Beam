@@ -10,7 +10,6 @@ import android.support.v7.widget.RecyclerView;
 import android.util.Log;
 import android.view.View;
 import android.widget.ImageView;
-import android.widget.LinearLayout;
 import android.widget.TextView;
 import android.widget.Toast;
 
@@ -21,8 +20,6 @@ import com.example.apichaya.addrealmsudent.customs.AbstractToolbarActivity;
 import com.example.apichaya.addrealmsudent.database.ChemicalManager;
 import com.example.apichaya.addrealmsudent.database.TestManager;
 import com.example.apichaya.addrealmsudent.dialog.MyAlertDialog;
-import com.theartofdev.edmodo.cropper.CropImage;
-import com.theartofdev.edmodo.cropper.CropImageView;
 
 import java.io.IOException;
 import java.util.ArrayList;
@@ -35,7 +32,6 @@ public class AddActivity extends AbstractToolbarActivity implements View.OnClick
     private int blueValue = 0;
     private Bitmap bitmap;
 
-    //    TextView btn2;
     private TextView txtName;
     private TextView txtRed;
     private TextView txtGreen;
@@ -61,7 +57,7 @@ public class AddActivity extends AbstractToolbarActivity implements View.OnClick
     }
 
     @Override
-    protected void bindActionbar(ImageView imgIcon, ImageView menuLeft, LinearLayout toolbar, TextView txtTitleToolbar) {
+    protected void bindActionbar(ImageView imgIcon, ImageView menuLeft, ImageView imgIconRight, TextView txtTitleToolbar) {
         setTitle("Add experiment");
     }
 
@@ -79,7 +75,6 @@ public class AddActivity extends AbstractToolbarActivity implements View.OnClick
         imageview = (ImageView) findViewById(R.id.quick_start_cropped_image);
         mRecyclerView = (RecyclerView) findViewById(R.id.recycleView);
 
-//        btn2.setOnClickListener(this);
         txtAdd.setOnClickListener(this);
 
         chemicalId = getIntent().getIntExtra(MainActivity.EXTRA_CHEMICAL_ID, 0);
@@ -132,25 +127,17 @@ public class AddActivity extends AbstractToolbarActivity implements View.OnClick
     }
 
     public void onSelectImageClick(View view) {
-        CropImage.activity(null)
-                .setGuidelines(CropImageView.Guidelines.ON)
-                .setCropShape(CropImageView.CropShape.OVAL)
-                .setGuidelinesColor(Color.BLACK)
-                .setBorderCornerColor(Color.BLACK)
-                .setBorderLineColor(Color.BLACK)
-                .setCropMenuCropButtonTitle("Done")
-                .setRequestedSize(400, 400)
-                .start(this);
+        Intent intent = new Intent(activity, CropImageActivity.class);
+        startActivityForResult(intent, 123);
     }
 
     @Override
     protected void onActivityResult(int requestCode, int resultCode, Intent data) {
         // handle result of CropImageActivity
-        if (requestCode == CropImage.CROP_IMAGE_ACTIVITY_REQUEST_CODE) {
-            CropImage.ActivityResult result = CropImage.getActivityResult(data);
+        if (requestCode == 123) {
             if (resultCode == RESULT_OK) {
                 try {
-                    bitmap = MediaStore.Images.Media.getBitmap(this.getContentResolver(), result.getUri());
+                    bitmap = MediaStore.Images.Media.getBitmap(this.getContentResolver(), data.getData());
                 } catch (IOException e) {
                     e.printStackTrace();
                 }
@@ -160,10 +147,7 @@ public class AddActivity extends AbstractToolbarActivity implements View.OnClick
 
                 txtAdd.setAlpha(1f);
                 txtAdd.setEnabled(true);
-
-//                Toast.makeText(this, "Cropping successful, Sample: " + result.getSampleSize(), Toast.LENGTH_LONG).show();
-            } else if (resultCode == CropImage.CROP_IMAGE_ACTIVITY_RESULT_ERROR_CODE) {
-                Toast.makeText(this, "Cropping failed: " + result.getError(), Toast.LENGTH_LONG).show();
+                Toast.makeText(activity, "image cropped", Toast.LENGTH_SHORT).show();
             }
         }
     }
@@ -252,10 +236,6 @@ public class AddActivity extends AbstractToolbarActivity implements View.OnClick
     @Override
     public void onClick(View view) {
         switch (view.getId()) {
-//            case R.id.textviewCalculate:
-//                Intent intent = new Intent(AddActivity.this, CalculateActivity.class);
-//                startActivity(intent);
-//                break;
             case R.id.textviewAdd:
                 if (redValue == 0 && greenValue == 0 && blueValue == 0) {
                     return;
@@ -288,11 +268,6 @@ public class AddActivity extends AbstractToolbarActivity implements View.OnClick
                 txtAdd.setAlpha(0.5f);
                 txtAdd.setEnabled(false);
                 break;
-
-//            case R.id.delButton:
-//                deleteData();
-//                showData();
-//                break;
 
             default:
                 break;

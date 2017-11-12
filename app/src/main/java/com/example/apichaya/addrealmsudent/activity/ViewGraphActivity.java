@@ -47,7 +47,7 @@ public class ViewGraphActivity extends AbstractToolbarActivity {
     }
 
     @Override
-    protected void bindActionbar(ImageView imgIcon, ImageView menuLeft, LinearLayout toolbar, TextView txtTitleToolbar) {
+    protected void bindActionbar(ImageView imgIcon, ImageView menuLeft, ImageView imgIconRight, TextView txtTitleToolbar) {
         setTitle("View graph");
     }
 
