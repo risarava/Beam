@@ -28,6 +28,7 @@ public class MyAlertDialog extends AlertDialog implements View.OnClickListener {
 
     private OnClickPositiveAddSubstanceListener onClickPositiveAddSubstanceListener;
     private OnClickPositiveListener onClickPositiveListener;
+    private OnSelectListener onSelectListener;
 
     public MyAlertDialog(Context context) {
         super(context);
@@ -49,6 +50,13 @@ public class MyAlertDialog extends AlertDialog implements View.OnClickListener {
         dialogAlert();
     }
 
+    public MyAlertDialog(Context context, OnSelectListener onSelectListener) {
+        super(context);
+        this.context = context;
+        this.onSelectListener = onSelectListener;
+        dialogSelectPicture();
+    }
+
     public static void dialogAlert(Context context, OnClickPositiveListener onClickPositiveListener) {
         MyAlertDialog myAlertDialog = new MyAlertDialog(context, onClickPositiveListener);
         myAlertDialog.show();
@@ -64,6 +72,11 @@ public class MyAlertDialog extends AlertDialog implements View.OnClickListener {
         MyAlertDialog myAlertDialog = new MyAlertDialog(context, onClickPositiveAddSubstanceListener);
         myAlertDialog.setName(name);
         myAlertDialog.setPPM(ppm);
+        myAlertDialog.show();
+    }
+
+    public static void dialogSelect(Context context, OnSelectListener onSelectListener) {
+        MyAlertDialog myAlertDialog = new MyAlertDialog(context, onSelectListener);
         myAlertDialog.show();
     }
 
@@ -108,6 +121,24 @@ public class MyAlertDialog extends AlertDialog implements View.OnClickListener {
 
     }
 
+    private void dialogSelectPicture() {
+        LayoutInflater inflater = (LayoutInflater) context
+                .getSystemService(Context.LAYOUT_INFLATER_SERVICE);
+        View view = inflater.inflate(R.layout.dialog_select_picture, null);
+        setView(view);
+        getWindow().setBackgroundDrawable(new ColorDrawable(Color.TRANSPARENT));
+
+        setCanceledOnTouchOutside(false);
+        txtNegativeButton = (TextView) view.findViewById(R.id.textviewCancel);
+        TextView txtGallery = (TextView) view.findViewById(R.id.textviewGallery);
+        TextView txtTakePhoto = (TextView) view.findViewById(R.id.textviewCamera);
+
+        txtNegativeButton.setOnClickListener(this);
+        txtGallery.setOnClickListener(this);
+        txtTakePhoto.setOnClickListener(this);
+
+    }
+
     private void setName(String name) {
         edtName.setText(name);
     }
@@ -136,7 +167,24 @@ public class MyAlertDialog extends AlertDialog implements View.OnClickListener {
                 }
                 break;
             case R.id.textviewCancel:
+                if (onSelectListener != null) {
+                    onSelectListener.cancel();
+                }
                 dismiss();
+                break;
+            case R.id.textviewGallery:
+                if (onSelectListener == null) {
+                    return;
+                }
+                dismiss();
+                onSelectListener.selectGallery();
+                break;
+            case R.id.textviewCamera:
+                if (onSelectListener == null) {
+                    return;
+                }
+                dismiss();
+                onSelectListener.selectTakePhoto();
                 break;
             default:
                 break;
@@ -163,5 +211,13 @@ public class MyAlertDialog extends AlertDialog implements View.OnClickListener {
 
     public interface OnClickPositiveListener {
         void onClicked();
+    }
+
+    public interface OnSelectListener {
+        void selectGallery();
+
+        void selectTakePhoto();
+
+        void cancel();
     }
 }

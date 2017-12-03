@@ -63,7 +63,6 @@ public class AddActivity extends AbstractToolbarActivity implements View.OnClick
 
     @Override
     protected void bindUI(Bundle savedInstanceState) {
-//        btn2 = (TextView) findViewById(R.id.textviewCalculate);
         txtName = (TextView) findViewById(R.id.textviewName);
         txtAdd = (TextView) findViewById(R.id.textviewAdd);
         txtRedPercent = (TextView) findViewById(R.id.textviewRedPercent);
@@ -147,7 +146,6 @@ public class AddActivity extends AbstractToolbarActivity implements View.OnClick
 
                 txtAdd.setAlpha(1f);
                 txtAdd.setEnabled(true);
-                Toast.makeText(activity, "image cropped", Toast.LENGTH_SHORT).show();
             }
         }
     }
@@ -221,7 +219,7 @@ public class AddActivity extends AbstractToolbarActivity implements View.OnClick
 
         txtRedPercent.setText(String.format("%.2f ", percentRed) + " %");
         txtGreenPercent.setText(String.format("%.2f ", percentGreen) + " %");
-        txtBluePercent.setText(String.format("Blu%.2f ", percentBlue) + " %");
+        txtBluePercent.setText(String.format("%.2f ", percentBlue) + " %");
 
         Log.e("Color red = ", String.valueOf(r));
         Log.e("Color G = ", String.valueOf(g));

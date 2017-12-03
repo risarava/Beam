@@ -1,6 +1,5 @@
 package com.example.apichaya.addrealmsudent.activity;
 
-import android.Manifest;
 import android.app.Activity;
 import android.content.Intent;
 import android.content.pm.PackageManager;
@@ -11,7 +10,6 @@ import android.graphics.Rect;
 import android.media.ExifInterface;
 import android.media.MediaScannerConnection;
 import android.net.Uri;
-import android.os.Build;
 import android.os.Bundle;
 import android.os.Environment;
 import android.provider.MediaStore;
@@ -24,6 +22,8 @@ import com.example.apichaya.addrealmsudent.R;
 import com.example.apichaya.addrealmsudent.customs.AbstractToolbarActivity;
 import com.example.apichaya.addrealmsudent.customs.FileName;
 import com.example.apichaya.addrealmsudent.customs.FileSize;
+import com.example.apichaya.addrealmsudent.customs.MyIntent;
+import com.example.apichaya.addrealmsudent.dialog.MyAlertDialog;
 import com.theartofdev.edmodo.cropper.CropImageView;
 
 import java.io.ByteArrayOutputStream;
@@ -33,6 +33,8 @@ import java.io.FileOutputStream;
 import java.io.IOException;
 import java.util.Date;
 
+import static com.example.apichaya.addrealmsudent.customs.MyIntent.PERMISSION_READ_EXTERNAL_STORAGE;
+
 /**
  * Created by apple on 11/12/2017 AD.
  */
@@ -40,7 +42,7 @@ import java.util.Date;
 public class CropImageActivity extends AbstractToolbarActivity {
 
     public static final int REQUEST_CAMERA = 1;
-    private static final int MY_REQUEST_READ_STORAGE = 44;
+    public static final int REQUEST_IMAGE_GALLERY = 12;
 
     private int indexClicked = 0;
     private String imageFileName;
@@ -83,17 +85,9 @@ public class CropImageActivity extends AbstractToolbarActivity {
     @Override
     protected void setupUI() {
         onBackPressedButtonLeft();
-        if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.M) {
-            if (activity.checkSelfPermission(
-                    Manifest.permission.READ_EXTERNAL_STORAGE) != PackageManager.PERMISSION_GRANTED) {
-                requestPermissions(new String[]{Manifest.permission.READ_EXTERNAL_STORAGE}, MY_REQUEST_READ_STORAGE);
-            } else {
-                cameraIntent();
-            }
-        } else {
-            cameraIntent();
+        if (MyIntent.isRequestPermissionReadExternalStorage(activity)) {
+            alertSelect();
         }
-
         cropImageView.setOnSetCropOverlayMovedListener(new CropImageView.OnSetCropOverlayMovedListener() {
             @Override
             public void onCropOverlayMoved(Rect rect) {
@@ -103,12 +97,36 @@ public class CropImageActivity extends AbstractToolbarActivity {
 
     }
 
+    private void alertSelect() {
+        MyAlertDialog.dialogSelect(activity, new MyAlertDialog.OnSelectListener() {
+            @Override
+            public void selectGallery() {
+                selectImageGallery();
+            }
+
+            @Override
+            public void selectTakePhoto() {
+                cameraIntent();
+            }
+
+            @Override
+            public void cancel() {
+                onBackPressed();
+            }
+        });
+    }
+
     public void doneButton(View view) {
-        Intent intent = new Intent();
-        intent.setData(Uri.fromFile(convertBitmapToFile(cropImageView.getCroppedImage())));
-        setResult(RESULT_OK, intent);
-        finishActivity(123);
-        finish();
+        cropImageView.post(new Runnable() {
+            @Override
+            public void run() {
+                Intent intent = new Intent();
+                intent.setData(Uri.fromFile(FileSize.reduceImageSize(convertBitmapToFile(cropImageView.getCroppedImage()))));
+                setResult(RESULT_OK, intent);
+                finishActivity(123);
+                finish();
+            }
+        });
     }
 
     private void deleteImage(File fileImage) {
@@ -145,12 +163,18 @@ public class CropImageActivity extends AbstractToolbarActivity {
         startActivityForResult(takePhotoIntent, REQUEST_CAMERA);
     }
 
+    public void selectImageGallery() {
+        if (MyIntent.isRequestPermissionReadExternalStorage(activity)) {
+            MyIntent.startIntentGallery(activity, REQUEST_IMAGE_GALLERY);
+        }
+    }
+
     @Override
     public void onRequestPermissionsResult(int requestCode, String[] permissions, int[] grantResults) {
         switch (requestCode) {
-            case MY_REQUEST_READ_STORAGE:
+            case PERMISSION_READ_EXTERNAL_STORAGE:
                 if (grantResults[0] == PackageManager.PERMISSION_GRANTED) {
-                    cameraIntent();
+                    alertSelect();
                 } else {
                     finish();
                     // Your app will not have this permission. Turn off all functions
@@ -169,6 +193,20 @@ public class CropImageActivity extends AbstractToolbarActivity {
         if (resultCode == RESULT_OK) {
             if (requestCode == REQUEST_CAMERA) {
                 onCaptureImageResult(data);
+            } else if (requestCode == REQUEST_IMAGE_GALLERY) {
+                Uri imageUri = data.getData();
+                Bitmap bitmap = null;
+                try {
+                    bitmap = MediaStore.Images.Media.getBitmap(this.getContentResolver(), imageUri);
+                } catch (IOException e) {
+                    e.printStackTrace();
+                }
+                if (bitmap == null) {
+                    return;
+                }
+                cropImageView.setImageBitmap(bitmap);
+                txtImageSize.setText("Image size " + cropImageView.getWholeImageRect().width() + "x"
+                        + cropImageView.getWholeImageRect().height());
             }
         } else {
             finish();
